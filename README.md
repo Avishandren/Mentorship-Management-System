@@ -1,1 +1,3 @@
 # Mentorship-Management-System
+
+The Mentorship Management System (MMS) aims to streamline and enhance the mentor-mentee relationship at the Durban University of Technology (DUT). Currently, students face difficulties in accessing proper guidance, tracking progress, and maintaining effective communication with mentors. The lack of a structured system results in inefficiencies, disengagement, and lost opportunities for student development. MMS seeks to address these challenges by providing a digital platform that facilitates seamless mentor-mentee interactions, ensuring a structured and beneficial support system for students.
