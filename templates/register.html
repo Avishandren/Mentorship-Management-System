@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .sidebar {
+            width: 30%;
+            max-width: 250px;
+            background: #333;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: fixed;
+            height: 100%;
+        }
+
+        .sidebar h1 {
+            margin-bottom: 20px;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        .sidebar a:hover {
+            background: #575757;
+        }
+
+        .content {
+            margin-left: 250px;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            position: relative;
+            padding: 20px;
+        }
+
+        .register-form {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .register-form input, .register-form button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .register-form button {
+            background: #333;
+            color: white;
+            cursor: pointer;
+        }
+
+        .register-form button:hover {
+            background: #575757;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            background: #222;
+            color: white;
+            padding: 10px;
+        }
+
+        .message {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 80%;
+    max-width: 400px;
+}
+
+.alert {
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    text-align: center;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+.alert-success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.alert-danger {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.alert-warning {
+    background-color: #f39c12;
+    color: white;
+}
+
+.alert-info {
+    background-color: #3498db;
+    color: white;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h1>Navigation</h1>
+        <a href="{{ url_for('login') }}">Login</a>
+        <a href="{{ url_for('register') }}">Register</a>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    </div>
+
+    <div class="content">
+        <h1>Register Page</h1>
+        <form method="POST" action="" class="register-form">
+            {{ form.hidden_tag() }}
+            {{ form.username }}
+            {{ form.password }}
+            {{ form.email }}
+            {{ form.PhoneNumber }}
+            {{ form.submit }}
+        </form>
+    </div>
+    <div class="message">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    </div>
+    <div class="footer">
+        <p>Contact: example@email.com | <a href="{{ url_for('login') }}" style="color: white;">Login</a></p>
+    </div>
+</body>
+</html>

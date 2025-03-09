@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .sidebar {
+            width: 30%;
+            max-width: 250px;
+            background: #333;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: fixed;
+            height: 100%;
+        }
+
+        .sidebar h1 {
+            margin-bottom: 20px;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        .sidebar a:hover {
+            background: #575757;
+        }
+
+        .content {
+            margin-left: 250px;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .content img {
+            width: 100%;
+            height: auto;
+            max-height: 80vh;
+            object-fit: cover;
+        }
+
+        .content .overlay {
+            position: absolute;
+           
+            font-size: 2rem;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 20%;
+            text-align: center;
+            background: #222;
+            color: white;
+            padding: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                max-width: none;
+                height: auto;
+                position: relative;
+                text-align: center;
+            }
+
+            .content {
+                margin-left: 0;
+                flex-direction: column;
+            }
+
+            .content img {
+                max-height: 50vh;
+            }
+        }
+
+        .message {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 80%;
+    max-width: 400px;
+}
+
+.alert {
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    text-align: center;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+.alert-success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.alert-danger {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.alert-warning {
+    background-color: #f39c12;
+    color: white;
+}
+
+.alert-info {
+    background-color: #3498db;
+    color: white;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 2rem;
+            font-weight: bold;
+           
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h1>Navigation</h1>
+        <a href="{{ url_for('login') }}">Login</a>
+        <a href="{{ url_for('register') }}">Register</a>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+<br><br>
+        <p> Looking forward to your success!, We are here to help you!, 
+            get inside 0ur workspace and start your journey today 
+        </p>
+    </div>
+
+    <div class="content">
+        <img src="static/pictures/home1.jpeg" alt="Mentor Mentor">
+            <div class="overlay">Mentor Management</div>
+    
+        
+    </div>
+    <div class="message">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    </div>
+    <div class="footer">
+        <p>Contact: example@email.com | <a href="{{ url_for('login') }}" style="color: white;">Login</a></p>
+    </div>
+</body>
+</html>

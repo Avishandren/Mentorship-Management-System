@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Main content */
+        .main-content {
+            padding: 20px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .alert-success {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .alert-danger {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .alert-info {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .alert-warning {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        /* Button */
+        a {
+            text-decoration: none;
+            background-color: #008CBA;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        a:hover {
+            background-color: #007B9E;
+        }
+
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Side Nav Bar */
+        .side-nav {
+            width: 250px;
+            background-color: #333;
+            position: fixed;
+            height: 100%;
+            padding-top: 20px;
+            color: white;
+        }
+
+        .side-nav a {
+            padding: 10px 15px;
+            text-decoration: none;
+            color: white;
+            display: block;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .side-nav a:hover {
+            background-color: #575757;
+        }
+
+        /* Main content area */
+        .main-content {
+            margin-left: 260px;
+            padding: 20px;
+            width: 100%;
+        }
+
+        /* Profile Section */
+        .profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .profile img {
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            margin-right: 20px;
+        }
+
+        .profile .profile-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile .profile-info h3 {
+            margin: 0;
+        }
+
+        .profile .profile-info button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .profile .profile-info button:hover {
+            background-color: #45a049;
+        }
+
+        /* Session and Messages Section */
+        .my-sessions, .my-messages {
+            margin-bottom: 20px;
+        }
+
+        .my-sessions button, .my-messages button {
+            padding: 10px;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 200px;
+        }
+
+        .my-sessions button:hover, .my-messages button:hover {
+            background-color: #007B9E;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <h1>Hello User , Welcome to your Dashboard</h1>
+        <a href="{{url_for('logout')}}">Press here to logout</a>
+    </div>
+
+
+     <!-- Side Nav Bar -->
+     <div class="side-nav">
+        <a href="#">Dashboard</a>
+        <a href="#">Settings</a>
+        <a href="{{url_for('logout')}}">Logout</a>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- Profile Section -->
+        <div class="profile">
+            
+            <img src="static/pictures/images.png" alt="Mentor Mentor">
+            <div class="profile-info">
+                <h3>Name : User Name</h3>
+                <button onclick="window.location.href='manage-profile.html'">Manage Profile</button>
+            </div>
+        </div>
+
+        <!-- My Sessions Button -->
+        <div class="my-sessions">
+            <button onclick="window.location.href='my-sessions.html'">My Sessions</button>
+        </div>
+
+        <!-- My Messages Button -->
+        <div class="my-messages">
+            <button onclick="window.location.href='my-messages.html'">My Messages</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Your Company. All rights reserved.</p>
+    </footer>
+</body>
+
+</html>
