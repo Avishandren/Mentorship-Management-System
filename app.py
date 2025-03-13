@@ -1,11 +1,21 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_migrate import Migrate  # Import Flask-Migrate
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'  # Change this in production
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+#db = SQLAlchemy(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://mentoring_management_system_user:73huaJo02E1xVfMmTrx69tJEkUKSk5xw@dpg-cv95jd2n91rc73d6v13g-a.oregon-postgres.render.com/mentoring_management_system"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)  # Initialize migration
+#############################################################
+import os
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://mentoring_management_system_user:73huaJo02E1xVfMmTrx69tJEkUKSk5xw@dpg-cv95jd2n91rc73d6v13g-a.oregon-postgres.render.com/mentoring_management_system')
+
+##############################################################
 
 # User model
 class User(db.Model):
@@ -138,12 +148,22 @@ def view_users():
     users = User.query.all()
     return render_template('view_users.html', users=users)
 
+##################################################################
+@app.route('/test')
+def test_db():
+    try:
+        # Attempt to insert a test user into the database
+        db.session.execute("INSERT INTO user (username, password) VALUES ('testuser', 'testpassword')")
+        db.session.commit()
+        return "Test User Added Successfully!"
+    except Exception as e:
+        return f"Error: {str(e)}"
 
-
-
-if __name__ == '__main__':  
+###################################################################
+#if __name__ == '__main__':  
     # Initialize the database (Comment the two next lines if you can create the table through the terminal)
-    with app.app_context():  
-        db.create_all()  
 
-    app.run(debug=True)
+ #   app.run(debug=True)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
