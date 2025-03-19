@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Applications</title>
+</head>
+<body>
+    
+    {% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>My Applications</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Application ID</th>
+                <th>Answers</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in applications %}
+            <tr>
+                <td>{{ app.app_id }}</td>
+                <td>{{ app.answers }}</td>
+                <td>{{ app.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+
+</body>
+</html>

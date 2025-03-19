@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply To Be A Mentor</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .form-group textarea {
+            width: 100%;
+            height: 150px;
+            resize: none;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .btn-submit {
+            width: 100%;
+        }
+        .btn-back {
+            display: block;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #007bff;
+        }
+        .btn-back:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Apply to be a Mentor</h2>
+        <form method="POST">
+            <div class="form-group">
+                <label for="answers">Why should you be a mentor?</label>
+                <textarea name="answers" id="answers" placeholder="Enter your response here..." class="form-control" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-submit">Submit</button>
+        </form>
+        <a href="/dashboard" class="btn-back">Back to Dashboard</a>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
