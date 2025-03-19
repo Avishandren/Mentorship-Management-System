@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Applications</title>
+</head>
+<body>
+    
+    {% extends "base.html" %}
+
+    {% block content %}
+    <div class="container mt-4">
+        <h2>All Applications</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Application ID</th>
+                    <th>Student</th>
+                    <th>Answers</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in applications %}
+                <tr>
+                    <td>{{ app.app_id }}</td>
+                    <td>{{ app.student.username }}</td>
+                    <td>{{ app.answers }}</td>
+                    <td>{{ app.status }}</td>
+                    <td>
+                        {% if app.status == 'pending' %}
+                            <a href="{{ url_for('approve_application', app_id=app.app_id) }}" class="btn btn-success">Approve</a>
+                            <a href="{{ url_for('decline_application', app_id=app.app_id) }}" class="btn btn-danger">Decline</a>
+                        {% else %}
+                            {{ app.status }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endblock %}
+    
+
+</body>
+</html>
