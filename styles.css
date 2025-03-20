@@ -1,0 +1,9 @@
+.welcome-text {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.nav-link:hover, .btn:hover {
+    background-color: #f8f9fa;
+    color: #000;
+}
