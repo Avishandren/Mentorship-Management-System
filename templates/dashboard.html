@@ -27,7 +27,8 @@
                     <a href="/create_user" class="btn btn-success btn-block mb-2">Create User</a>
                 {% elif role == 'student' %}
                     <a href="/book_session" class="btn btn-primary btn-block mb-2">Book a Session</a>
-                    <a href="/join" class="btn btn-info btn-block mb-2">Join a Meeting</a>
+                    <a href="/join" class="btn btn-info btn-block mb-2">Join a Video Meeting</a>
+                    <a href="/apply" class="btn btn-info btn-block mb-2">Apply</a>
 
                     <div class="card">
                         <div class="card-header">Booking Calendar</div>
@@ -51,11 +52,40 @@
                     <a href="/my_bookings" class="btn btn-warning btn-block mb-2">My Bookings</a>
                 {% elif role == 'mentor' %}
                     <a href="/all_bookings" class="btn btn-info btn-block mb-2">View All Bookings</a>
-                    <a href="/meeting" class="btn btn-warning btn-block mb-2">Create A Meeting</a>
+                    <a href="/meeting" class="btn btn-warning btn-block mb-2">Create A Video Meeting</a>
+                    <a href="/email_students" class="btn btn-warning btn-block mb-2">Email students</a>
                 {% endif %}
+                <a href="/get_messages" class="btn btn-warning btn-block mb-2">My chatss</a>
                 <a href="/logout" class="btn btn-danger btn-block">Logout</a>
             </div>
         </div>
+
+
+        <div class="card">
+
+            <h1>Shared Resources</h1>
+    <ul id="resource-list">
+        <!-- Resources will be dynamically listed here -->
+    </ul>
+    <a href="upload.html">Upload Resource</a>
+    <script src="script.js"></script>
+</body>
+
+
+
+            </div>
+
+
+        <!--<div class="card">
+            <div class="card-header">Messages</div>
+            <div class="card-body">
+                {% if messages %}
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div> -->
 
        
 </body>

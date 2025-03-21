@@ -52,6 +52,8 @@
                     <td>
                         {% if booking.status == 'pending' %}
                             <a href="{{ url_for('cancel_session', booking_id=booking.booking_id) }}" class="action-btn">Cancel</a>
+                        {% elif booking.date < current_date %}
+                            <a href="{{ url_for('delete_session', booking_id=booking.booking_id) }}" class="action-btn">Delete</a>
                         {% endif %}
                     </td>
                 </tr>
