@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Applicants</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            color: #444;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        li {
+            background: #fff;
+            margin: 10px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        li a {
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+        }
+        li a:hover {
+            text-decoration: underline;
+        }
+        p {
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Applicants</h1>
+
+    <!-- Debugging: Check if applications data is being passed -->
+    <p>{{ applications }}</p>  <!-- Should print the list of applications if the route works correctly -->
+    
+    <ul>
+        {% for application in applications %}
+        <li><a href="{{ url_for('view_applicant', application_id=application.id) }}">{{ application.student_id }}</a></li>
+
+        {% else %}
+        <p>No applicants found.</p>
+        {% endfor %}
+    </ul>
+</body>
+</html>
