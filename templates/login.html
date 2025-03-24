@@ -43,7 +43,15 @@
     
         <!-- Divider -->
         <div class="divider"></div>
-    
+    <div class="errors"> {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}</div>
         <!-- Right Section (30%) - Login -->
         <div class="right-section d-flex justify-content-center align-items-center">
             <div class="card p-4 shadow-lg login-form">

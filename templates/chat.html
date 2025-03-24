@@ -1,117 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
+<form id="chat-form">
+    <input type="hidden" id="receiver_id" value="{{ receiver_id }}">
+    <input type="hidden" id="receiver_role" value="{{ receiver_role }}">
+    <textarea id="message" placeholder="Type your message..."></textarea>
+    <input type="file" id="file">
+    <button type="submit">Send</button>
+</form>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat</title>
-    <style>
-        #chat-container {
-            border: 1px solid #ccc;
-            padding: 10px;
-            height: 300px;
-            overflow-y: scroll;
-            margin-bottom: 10px;
-        }
+<div id="chat-container"></div>
 
-        #message {
-            width: 100%;
-            height: 50px;
-            margin-bottom: 10px;
-        }
-    </style>
-</head>
+<script>
+document.getElementById('chat-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    
+    const receiver_id = document.getElementById('receiver_id').value;
+    const receiver_role = document.getElementById('receiver_role').value;
+    const message = document.getElementById('message').value;
+    const file = document.getElementById('file').files[0];
 
-<body>
-    <h1>Chat with {{ receiver_role }} (ID: {{ receiver_id }})</h1>
+    const formData = new FormData();
+    formData.append('receiver_id', receiver_id);
+    formData.append('receiver_role', receiver_role);
+    formData.append('content', message);
+    if (file) formData.append('file', file);
 
-    <!-- Chat Form -->
-    <form id="chat-form">
-        <input type="hidden" id="receiver_id" value="{{ receiver_id }}">
-        <input type="hidden" id="receiver_role" value="{{ receiver_role }}">
-        <textarea id="message" placeholder="Type your message..."></textarea>
-        <input type="file" id="file">
-        <button type="submit">Send</button>
-    </form>
+    await fetch('/send_message', {
+        method: 'POST',
+        body: formData
+    });
 
-    <!-- Chat Container -->
-    <div id="chat-container"></div>
+    loadMessages();
+});
 
-    <script>
-        // Handle form submission
-        document.getElementById('chat-form').addEventListener('submit', async (event) => {
-            event.preventDefault();
+async function loadMessages() {
+    const receiver_id = document.getElementById('receiver_id').value;
+    const receiver_role = document.getElementById('receiver_role').value;
 
-            const receiver_id = document.getElementById('receiver_id').value;
-            const receiver_role = document.getElementById('receiver_role').value;
-            const message = document.getElementById('message').value;
-            const file = document.getElementById('file').files[0];
+    const response = await fetch(`/get_messages/${receiver_id}/${receiver_role}`);
+    const messages = await response.json();
 
-            const formData = new FormData();
-            formData.append('receiver_id', receiver_id);
-            formData.append('receiver_role', receiver_role);
-            formData.append('content', message);
-            if (file) formData.append('file', file);
+    document.getElementById('chat-container').innerHTML = messages.map(msg => 
+        `<p>${msg.content} ${msg.file_url ? `<a href="${msg.file_url}">[File]</a>` : ''}</p>`
+    ).join('');
+}
 
-            try {
-                const response = await fetch('/send_message', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to send message');
-                }
-
-                // Clear the message input after sending
-                document.getElementById('message').value = '';
-                document.getElementById('file').value = '';
-
-                // Reload messages
-                loadMessages();
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        });
-
-        // Function to load messages
-
-        async function loadMessages() {
-            const receiver_id = document.getElementById('receiver_id').value;
-            const receiver_role = document.getElementById('receiver_role').value;
-
-            try {
-                // Include receiver_id and receiver_role in the URL
-                const response = await fetch(`/get_messages/${receiver_id}/${receiver_role}`);
-                if (!response.ok) {
-                    throw new Error('Failed to load messages');
-                }
-
-                const messages = await response.json();
-
-                // Clear the chat container before appending new messages
-                const chatContainer = document.getElementById('chat-container');
-                chatContainer.innerHTML = '';
-
-                messages.forEach(msg => {
-                    const messageElement = document.createElement('p');
-                    messageElement.innerHTML = `
-                <strong>${msg.timestamp}:</strong> ${msg.content} 
-                ${msg.file_url ? `<a href="${msg.file_url}" target="_blank">[File]</a>` : ''}
-            `;
-                    chatContainer.appendChild(messageElement);
-                });
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-        // Load messages every 5 seconds
-        setInterval(loadMessages, 5000);
-
-        // Load messages when the page loads
-        loadMessages();
-    </script>
-</body>
-
-</html>
+setInterval(loadMessages, 5000);
+</script>

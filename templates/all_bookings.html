@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Bookings</title>
-    <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -54,8 +53,12 @@
                     <td>{{ booking.status }}</td>
                     <td>
                         {% if booking.status == 'pending' %}
-                            <a href="{{ url_for('approve_booking', booking_id=booking.booking_id) }}">Approve</a> |
-                            <a href="{{ url_for('decline_booking', booking_id=booking.booking_id) }}">Decline</a>
+                            <a href="{{ url_for('approve_booking', booking_id=booking.booking_id) }}" class="btn btn-success">Approve</a> |
+                            <a href="{{ url_for('decline_booking', booking_id=booking.booking_id) }}" class="btn btn-danger">Decline</a>
+                        {% elif booking.status == 'approved' %}
+                            <a href="{{ url_for('email_students', booking_id=booking.booking_id, status=booking.status) }}" class="btn btn-info btn-sm">Email Student</a>
+                        {% else %}
+                            <a href="{{ url_for('dashboard', booking_id=booking.booking_id, status=booking.status) }}" class="btn btn-info btn-sm">Email Student</a>
                         {% endif %}
                     </td>
                 </tr>
@@ -64,7 +67,6 @@
         </table>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

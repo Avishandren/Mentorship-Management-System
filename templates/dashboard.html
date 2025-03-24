@@ -15,9 +15,19 @@
     </style>
 </head>
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
     <div class="container">
         <h1 class="mb-4">Dashboard</h1>
         <h2>Welcome, {{ session['user'] }}</h2>
+        
 
         <div class="card">
             <div class="card-header">Navigation</div>
@@ -25,14 +35,29 @@
                 {% if role == 'admin' %}
                     <a href="/users" class="btn btn-primary btn-block mb-2">View Users</a>
                     <a href="/create_user" class="btn btn-success btn-block mb-2">Create User</a>
+                    <a href="/all_applications" class="btn btn-danger btn-block mb-2">Mentor Applications</a>
+                    <a href="{{ url_for('all_reviews') }}" class="btn btn-secondary btn-block mb-2"> Mentor Analytics</a>
+                    <a href="{{ url_for('analytics') }}" class="btn btn-secondary btn-block mb-2"> Analytics</a>
+                    
                 {% elif role == 'student' %}
                     <a href="/book_session" class="btn btn-primary btn-block mb-2">Book a Session</a>
                     <a href="/join" class="btn btn-info btn-block mb-2">Join a Video Meeting</a>
-                    <a href="/apply" class="btn btn-info btn-block mb-2">Apply</a>
+                    <a href="/apply" class="btn btn-warning btn-block mb-2">Apply To Be A Mentor</a>
+                    <a href="/my_applications" class="btn btn-secondary btn-block mb-2"> My Applications</a>
+                    <a href="{{ url_for('review') }}" class="btn btn-secondary btn-block mb-2"> Reviews</a>
+                    <a href="{{ url_for('get_reviews') }}" class="btn btn-secondary btn-block mb-2">My Reviews</a>
+                    <a href="/manage_profile" class="btn btn-warning btn-block mb-2">Manage Profile</a>
+                   
+                    
+                    
+                    
+
+                    
+                   
 
                     <div class="card">
                         <div class="card-header">Booking Calendar</div>
-                        <div class="card-body">
+                        <div class="card-body"> 
                             <div id="calendar"></div>
                         </div>
                     </div>
@@ -54,26 +79,22 @@
                     <a href="/all_bookings" class="btn btn-info btn-block mb-2">View All Bookings</a>
                     <a href="/meeting" class="btn btn-warning btn-block mb-2">Create A Video Meeting</a>
                     <a href="/email_students" class="btn btn-warning btn-block mb-2">Email students</a>
+                    <a href="/manage_profile" class="btn btn-warning btn-block mb-2">Manage Profile</a>
+                   
+
                 {% endif %}
-                <a href="/get_messages" class="btn btn-warning btn-block mb-2">My chatss</a>
+                
                 <a href="/logout" class="btn btn-danger btn-block">Logout</a>
             </div>
         </div>
 
 
-        <div class="card">
-
-            <h1>Shared Resources</h1>
-    <ul id="resource-list">
-        <!-- Resources will be dynamically listed here -->
-    </ul>
-    <a href="upload.html">Upload Resource</a>
-    <script src="script.js"></script>
+        
 </body>
 
 
 
-            </div>
+            
 
 
         <!--<div class="card">

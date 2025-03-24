@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from flask_migrate import Migrate
 import json
-from flask import jsonify, request
+from flask import jsonify, request, flash
 from datetime import date
 import re
 from flask_mail import Mail, Message
@@ -14,9 +14,10 @@ import os
 app = Flask(__name__)
 CORS(app) #1r
 app.secret_key = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users1.db'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///final.db'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///testing1.db'
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///resources.db'
-app.config['UPLOAD_FOLDER'] = 'uploads'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
@@ -28,11 +29,11 @@ app.config['MAIL_PASSWORD'] = 'rufc leoy ymeb ywhm'
 
 
 
+
+
 mail = Mail(app)
 
-# Ensure the upload folder exists
-if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.makedirs(app.config['UPLOAD_FOLDER'])
+#tables
 
 class Student(db.Model):
     student_id = db.Column(db.Integer, primary_key=True)
@@ -48,16 +49,10 @@ def is_valid_email(email):
     email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
     return re.match(email_regex, email)
 
-class Message(db.Model):
-    message_id = db.Column(db.Integer, primary_key=True)
-    sender_id = db.Column(db.Integer, nullable=False)
-    receiver_id = db.Column(db.Integer, nullable=False)
-    content = db.Column(db.Text, nullable=True)
-    file_url = db.Column(db.String(255), nullable=True)  # Store file URL if a file is uploaded
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def __repr__(self):
-        return f'<Message {self.message_id}>'
+def is_dut_email(email):
+    """Check if the email is a DUT4Life email address"""
+    dut_email_regex = r'^[a-zA-Z0-9_.+-]+@dut4life\.ac\.za$'
+    return re.match(dut_email_regex, email)
 
 
 
@@ -65,6 +60,7 @@ class Mentor(db.Model):
     mentor_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
+    status = db.Column(db.String(20), default='available')  # Add status field
 
 class Booking(db.Model):
     booking_id = db.Column(db.Integer, primary_key=True)
@@ -77,13 +73,6 @@ class Booking(db.Model):
     student = db.relationship('Student', backref=db.backref('bookings', lazy=True))
     mentor = db.relationship('Mentor', backref=db.backref('bookings', lazy=True))
 
-#class Feedback(db.Model):
- #   feedback_id = db.Column(db.Integer, primary_key=True)
-  #  student_id = db.Column(db.Integer, db.ForeignKey('student.student_id'), nullable=False)
-   # mentor_id = db.Column(db.Integer, db.ForeignKey('mentor.mentor_id'), nullable=False)
-    #feedback = db.Column(db.Text, nullable=False)
-  #  student = db.relationship('Student', backref=db.backref('feedbacks', lazy=True))
-   # mentor = db.relationship('Mentor', backref=db.backref('feedbacks', lazy=True))
 
 
 class Apply(db.Model):
@@ -94,17 +83,48 @@ class Apply(db.Model):
     student = db.relationship('Student', backref=db.backref('applications', lazy=True))
 
 
-class Resource(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    mentor_id = db.Column(db.Integer, nullable=False)
-    filename = db.Column(db.String(255), nullable=False)
-    file_type = db.Column(db.String(50), nullable=False)
-    url = db.Column(db.String(500), nullable=False)
+# Review Model
+class Review(db.Model):
+    review_id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('student.student_id'), nullable=False)
+    category = db.Column(db.String(50), nullable=False)  # 'mentor', 'session', 'service', 'overall'
+    reference_id = db.Column(db.Integer, nullable=True)  # ID of the mentor/session/service if applicable
+    rating = db.Column(db.Integer, nullable=False)  # 1 to 5 stars
+    comment = db.Column(db.Text, nullable=True)
+    #date_created = db.Column(db.Date, default=date.today)  # Add date_created column
+    student = db.relationship('Student', backref=db.backref('reviews', lazy=True))
 
+class Test(db.Model):
+    test_id = db.Column(db.Integer, primary_key=True)
+    mentor_id = db.Column(db.Integer, db.ForeignKey('mentor.mentor_id'), nullable=False)
+    test_name = db.Column(db.String(255), nullable=False)
+    date_posted = db.Column(db.DateTime, default=datetime.utcnow)
+    questions = db.relationship('Question', backref='test', lazy=True)
 
+class Question(db.Model):
+    question_id = db.Column(db.Integer, primary_key=True)
+    test_id = db.Column(db.Integer, db.ForeignKey('test.test_id'), nullable=False)
+    question_text = db.Column(db.Text, nullable=False)
+    correct_answer = db.Column(db.Text, nullable=False)  # Store the correct answer
+    student_answers = db.relationship('StudentAnswer', backref='question', lazy=True)
 
+class StudentAnswer(db.Model):
+    answer_id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('student.student_id'), nullable=False)
+    question_id = db.Column(db.Integer, db.ForeignKey('question.question_id'), nullable=False)
+    test_id = db.Column(db.Integer, db.ForeignKey('test.test_id'), nullable=False)
+    student_answer = db.Column(db.Text, nullable=False)
+    is_correct = db.Column(db.Boolean, default=False)  # Store if the answer is correct
 
-ADMIN_CREDENTIALS = {'username': 'admin@gmail.com', 'password': 'admin123'}
+class TestResult(db.Model):
+    result_id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('student.student_id'), nullable=False)
+    test_id = db.Column(db.Integer, db.ForeignKey('test.test_id'), nullable=False)
+    score = db.Column(db.Integer, nullable=False)
+    total_questions = db.Column(db.Integer, nullable=False)
+    date_taken = db.Column(db.DateTime, default=datetime.utcnow)
+
+ADMIN_CREDENTIALS = {'username': 'admin@dut4life.ac.za', 'password': 'admin123'}
 
 @app.route('/')
 def home():
@@ -118,7 +138,14 @@ def login():
 
         # Ensure username is an email format
         if not is_valid_email(username):
-            return "Invalid email format. Please use a valid email address."
+            flash('Invalid email format. Please use a valid email address.', 'error')
+            #return "Invalid email format. Please use a valid email address."
+
+        # Ensure username is a dut email address
+        if not is_dut_email(username):
+            flash('Invalid email format. Please use a dut email address.', 'error')
+            #return "Invalid email format. Please use a dut email address."
+
 
         if username == ADMIN_CREDENTIALS['username'] and password == ADMIN_CREDENTIALS['password']:
             session['user'] = username
@@ -137,7 +164,8 @@ def login():
             session['role'] = 'mentor'
             return redirect(url_for('dashboard'))
 
-        return "Invalid credentials"
+        flash('Invalid credentials', 'error')
+        # return "Invalid credentials"
     return render_template('login.html')
 
 @app.route('/logout')
@@ -174,24 +202,53 @@ def update_user(role, user_id):
 
     return render_template('update_user.html', user=user, role=role)
 
+@app.route('/manage_profile', methods=['GET', 'POST'])
+def manage_profile():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    username = session['user']
+    role = session['role']
+
+    if role == 'student':
+        user = Student.query.filter_by(username=username).first()
+        return render_template('manage_profile_student.html', user=user)  # Student template
+    elif role == 'mentor':
+        user = Mentor.query.filter_by(username=username).first()
+        return render_template('manage_profile_mentor.html', user=user)  # Mentor template
+    else:
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        if role == 'student':
+            new_password = request.form['new_password']
+            confirm_password = request.form['confirm_password']
+
+            if new_password != confirm_password:
+                flash('Passwords do not match.', 'error')
+                return render_template('manage_profile_student.html', user=user)
+
+            user.password = generate_password_hash(new_password)
+            db.session.commit()
+            flash('Password updated successfully.', 'success')
+            return redirect(url_for('dashboard'))
+
+        elif role == 'mentor':
+            new_password = request.form['new_password']
+            confirm_password = request.form['confirm_password']
+            status = request.form.get('status')  # Get the status from the form
+
+            if new_password != confirm_password:
+                flash('Passwords do not match.', 'error')
+                return render_template('manage_profile_mentor.html', user=user)
+
+            user.password = generate_password_hash(new_password)
+            user.status = status  # Update mentor status
+            db.session.commit()
+            flash('Profile updated successfully.', 'success')
+            return redirect(url_for('dashboard'))
 
 
-
-#@app.route('/get_approved_bookings')
-#def get_approved_bookings():
- #   if 'user' not in session:
-  #      return jsonify([])
-#
- #   approved_bookings = Booking.query.filter_by(status='approved').all()
-    
-  #  events = []
-   ##    events.append({
-     #       "title": f"Session with Mentor {booking.mentor.username}",
-      ###    "backgroundColor": "#28a745",  # Green for approved sessions
-            #"borderColor": "#28a745"
-       # })
-    
-    #return jsonify(events)
 
 
 
@@ -224,13 +281,24 @@ def delete_session(booking_id):
     return redirect(url_for('my_bookings'))
 
 
-@app.route('/users')
+@app.route('/users', methods=['GET', 'POST'])
 def view_users():
     if 'user' not in session or session['role'] != 'admin':
         return redirect(url_for('login'))
-    
+
     students = Student.query.all()
     mentors = Mentor.query.all()
+
+    if request.method == 'POST':
+        search_term = request.form.get('search_term')
+        if search_term:
+            students = Student.query.filter(
+                (Student.username.ilike(f"%{search_term}%")) | (Student.student_id == search_term)
+            ).all()
+            mentors = Mentor.query.filter(
+                (Mentor.username.ilike(f"%{search_term}%")) | (Mentor.mentor_id == search_term)
+            ).all()
+
     return render_template('users.html', students=students, mentors=mentors)
 
 
@@ -247,6 +315,14 @@ def create_user():
         if not is_valid_email(username):
             return "Invalid email format. Please use a valid email address."
 
+         # Ensure username is a dut email address
+        if not is_dut_email(username):
+            return "Invalid email format. Please use a dut email address."
+
+        existing_user = Student.query.filter_by(username=username).first()
+        if existing_user:
+            return "User already exists. Please choose a different username."
+
         if role == 'student':
             user = Student(username=username, password=password)
         else:
@@ -257,6 +333,13 @@ def create_user():
         return redirect(url_for('view_users'))
     return render_template('create_user.html')
 
+
+    
+
+
+
+
+
 #the following consist of routes for students applying to be a mentor and admin can approve them
 #the admin can also decline them, still need to control the number of applications per student
 @app.route('/apply', methods=['GET', 'POST'])
@@ -264,14 +347,38 @@ def apply():
     if 'user' not in session or session['role'] != 'student':
         return redirect(url_for('login'))
     student = Student.query.filter_by(username=session['user']).first()
+    
+    existing_application = Apply.query.filter_by(student_id=student.student_id).first()
+    if existing_application:
+        flash('You have already submitted an application.', 'warning')
+        return redirect(url_for('dashboard'))
+    
     if request.method == 'POST':
         answers = request.form['answers']
         status = 'qualified' if "pass" in answers else 'pending'
         application = Apply(student_id=student.student_id, answers=answers, status=status)
         db.session.add(application)
         db.session.commit()
+        flash('Your application has been submitted, keep an eye on your email we will be in touch shortly!', 'success')
         return redirect(url_for('dashboard'))
     return render_template('apply.html')
+
+@app.route('/delete_application')
+def delete_application():
+    if 'user' not in session or session['role'] != 'student':
+        return redirect(url_for('login'))
+    
+    student = Student.query.filter_by(username=session['user']).first()
+    application = Apply.query.filter_by(student_id=student.student_id).first()
+    
+    if application:
+        db.session.delete(application)
+        db.session.commit()
+        flash('Your application has been deleted.', 'success')
+    else:
+        flash('You have no application to delete.', 'warning')
+    
+    return redirect(url_for('dashboard'))
 
 @app.route('/approve_mentor/<int:app_id>')
 def approve_mentor(app_id):
@@ -315,7 +422,7 @@ def approve_application(app_id):
         application.status = 'qualified'
         db.session.commit()
     
-    return redirect(url_for('all_applications'))
+    return redirect(url_for('create_user'))
 
 @app.route('/decline_application/<int:app_id>')
 def decline_application(app_id):
@@ -335,6 +442,11 @@ def decline_application(app_id):
 #This part has been giving me headache bu ke sothini!
 #Sessions
 
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from datetime import datetime
+
+# ... (your other imports and code) ...
+
 @app.route('/book_session', methods=['GET', 'POST'])
 def book_session():
     if 'user' not in session or session['role'] != 'student':
@@ -350,30 +462,66 @@ def book_session():
 
         # Convert booking date and time to a datetime object
         booking_datetime_str = f"{date} {booking_time}"
-        booking_datetime = datetime.strptime(booking_datetime_str, "%Y-%m-%d %H:%M")
+        try:
+            booking_datetime = datetime.strptime(booking_datetime_str, "%Y-%m-%d %H:%M")
+        except ValueError:
+            flash('Invalid date or time format.', 'error')
+            return redirect(url_for('book_session'))
 
         # Check if the booking time is in the past
         if booking_datetime < datetime.now():
-            return "You cannot book a session in the past!", 400
+            flash('You cannot book a session in the past!', 'error')
+            return redirect(url_for('book_session'))
 
-        # Check if the student has already booked this slot
-        existing_booking = Booking.query.filter_by(
-            student_id=student.student_id, 
+        # Check if the student has any existing booking
+        existing_booking = Booking.query.filter_by(student_id=student.student_id).first()
+
+        if existing_booking:
+            flash('You already have a booking!', 'error')
+            return redirect(url_for('book_session'))
+
+        # Check if the booking time is between 08:00 and 17:00
+        booking_hour = booking_datetime.hour
+        if not 8 <= booking_hour < 17:
+            flash('Booking time must be between 08:00 AM and 05:00 PM.', 'error')
+            return redirect(url_for('book_session'))
+
+        # Check if the mentor has already booked this slot
+        existing_mentor_booking = Booking.query.filter_by(
+            mentor_id=mentor_id, 
             date=date, 
             booking_time=booking_time
         ).first()
 
-        if existing_booking:
-            return "You have already booked a session at this time!", 400
+        if existing_mentor_booking:
+            flash('The mentor has already booked a session at this time!', 'error')
+            return redirect(url_for('book_session'))
 
         # Save the booking if all checks pass
         booking = Booking(student_id=student.student_id, mentor_id=mentor_id, booking_time=booking_time, date=date)
         db.session.add(booking)
         db.session.commit()
 
-        return redirect(url_for('my_bookings'))
+        flash('Thank you, you have successfully booked a session!', 'success')
+        return redirect(url_for('review'))
     
     return render_template('book_session.html', mentors=mentors)
+
+
+@app.route('/delete_booking/<int:booking_id>', methods=['POST'])
+def delete_booking(booking_id):
+    if 'user' not in session or session['role'] != 'student':
+        return redirect(url_for('login'))
+    
+    booking = Booking.query.get(booking_id)
+    if booking and booking.student.username == session['user']:
+        db.session.delete(booking)
+        db.session.commit()
+        flash('Your booking has been successfully deleted.', 'success')
+    else:
+        flash('Booking not found or you do not have permission to delete it.', 'error')
+    
+    return redirect(url_for('my_bookings'))
 
 @app.route('/cancel_session/<int:booking_id>')
 def cancel_session(booking_id):
@@ -500,7 +648,36 @@ def email_students():
         if not recipients:
             return "No recipients selected. Please choose at least one student.", 400
         
-        msg = Message(subject, sender='m48209921@gmail.com', recipients=recipients)
+        msg = Message(subject, sender='Bookingupdate@gmail.com', recipients=recipients)
+        msg.body = message_body
+        mail.send(msg)
+        
+        return redirect(url_for('dashboard'))
+    
+    return render_template('email_students.html', students=students)
+
+@app.route('/email_studentss', methods=['GET', 'POST'])
+def email_studentss():
+    if 'user' not in session or session['role'] != 'admin':
+        return redirect(url_for('login'))
+    
+    students = Student.query.all()
+    
+    if request.method == 'POST':
+        subject = request.form['subject']
+        message_body = request.form['message']
+        selected_students = request.form.getlist('students')
+        
+        if 'all' in selected_students:
+            recipients = [student.username for student in students]
+        else:
+            recipients = selected_students
+        
+        # Ensure recipients list is not empty
+        if not recipients:
+            return "No recipients selected. Please choose at least one student.", 400
+        
+        msg = Message(subject, sender='Mentorapplications@gmail.com', recipients=recipients)
         msg.body = message_body
         mail.send(msg)
         
@@ -509,126 +686,91 @@ def email_students():
     return render_template('email_students.html', students=students)
 
 
-#Messaging part 
-
-@app.route('/send_message', methods=['POST'])
-def send_message():
-    if 'user' not in session:
-        return jsonify({"error": "Unauthorized"}), 401  # User must be logged in
-
-    # Get data from the form
-    receiver_id = request.form.get('receiver_id')
-    receiver_role = request.form.get('receiver_role')
-    content = request.form.get('content')
-    file = request.files.get('file')
-
-    # Determine sender ID from session based on role
-    if session.get('role') == 'student':
-        sender_id = Student.query.filter_by(username=session['user']).first().student_id
-    elif session.get('role') == 'mentor':
-        sender_id = Mentor.query.filter_by(username=session['user']).first().mentor_id
-    else:
-        return jsonify({"error": "Invalid user role"}), 400
-
-    # If file is uploaded, save it to the file system
-    file_url = None
-    if file:
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        file.save(file_path)
-        file_url = file_path  # Store the file path or URL
-
-    # Create and save the message to the database
-    message = Message(sender_id=sender_id, receiver_id=receiver_id, content=content, file_url=file_url)
-    db.session.add(message)
-    db.session.commit()
-
-    return jsonify({"success": "Message sent successfully!"}), 200
-
-@app.route('/get_messages/<int:receiver_id>/<string:receiver_role>', methods=['GET'])
-def get_messages(receiver_id, receiver_role):
-    if 'user' not in session:
-        return jsonify({"error": "Unauthorized"}), 401  # User must be logged in
-
-    # Determine sender ID from session based on role
-    if session.get('role') == 'student':
-        sender_id = Student.query.filter_by(username=session['user']).first().student_id
-    elif session.get('role') == 'mentor':
-        sender_id = Mentor.query.filter_by(username=session['user']).first().mentor_id
-    else:
-        return jsonify({"error": "Invalid user role"}), 400
-
-    # Query messages where the sender and receiver match
-    messages = Message.query.filter(
-        ((Message.sender_id == sender_id) & (Message.receiver_id == receiver_id)) |
-        ((Message.sender_id == receiver_id) & (Message.receiver_id == sender_id))
-    ).order_by(Message.timestamp.asc()).all()
-
-    # Serialize messages to return as JSON
-    messages_data = [
-        {
-            'content': msg.content,
-            'file_url': msg.file_url,
-            'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')
-        } for msg in messages
-    ]
-
-    return jsonify(messages_data)
-
-# Route to render the chat page
-@app.route('/chat/<int:receiver_id>/<string:receiver_role>')
-def chat(receiver_id, receiver_role):
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    return render_template('chat.html', receiver_id=receiver_id, receiver_role=receiver_role)
 
 #Rating and Reviews part
+@app.route('/review', methods=['GET', 'POST'])
+def review():
+    if 'user' not in session or session['role'] != 'student':
+        return redirect(url_for('login'))
+    student = Student.query.filter_by(username=session['user']).first()
+
+    if request.method=='POST':
+        category = request.form['category']
+        reference_id = request.form['reference_id']
+        rating = request.form['rating']
+        comment = request.form['comment']
+
+        review = Review(student_id=student.student_id, category=category, reference_id=reference_id, rating=rating, comment=comment)
+        db.session.add(review)
+        db.session.commit()
+        flash('Thank you for rating us, this will help us improve better!', 'success')
+        return redirect(url_for('dashboard'))
+
+    return render_template('review.html')
+
+@app.route('/get_reviews')
+def get_reviews():
+    if 'user' not in session or session['role'] != 'student':
+        return redirect(url_for('login'))
+    student = Student.query.filter_by(username=session['user']).first()
+    reviews = Review.query.filter_by(student_id=student.student_id).all()
+    return render_template('reviews.html', reviews=reviews)
+    
+@app.route('/all_reviews')
+def all_reviews():
+    if 'user' not in session or session['role'] != 'admin':
+        return redirect(url_for('login'))
+    
+    reviews = Review.query.all()
+    return render_template('all_reviews.html', reviews=reviews)
+
+#trying a graph , lets hope it works
+@app.route('/rating_analytics')
+def rating_analytics():
+    if 'user' not in session or session['role'] != 'admin':
+        return redirect(url_for('login'))
+
+    today = date.today()
+    date_range = [today - timedelta(days=i) for i in range(7)]  # Last 7 days
+
+    rating_data = []
+    for day in date_range:
+        reviews_on_day = Review.query.filter_by(date_created=day).all()
+        if reviews_on_day:
+            total_ratings = sum(review.rating for review in reviews_on_day)
+            average_rating = total_ratings / len(reviews_on_day)
+            rating_data.append({'date': day.strftime('%Y-%m-%d'), 'average_rating': average_rating})
+        else:
+            rating_data.append({'date': day.strftime('%Y-%m-%d'), 'average_rating': 0})
+
+    return jsonify(rating_data)
+
+@app.route('/analytics')
+def analytics():
+    if 'user' not in session or session['role'] != 'admin':
+        return redirect(url_for('login'))
+    return render_template('analytics.html')
+
+
+#Messaging part 
+
+
 
 
 #resources
-@app.route('/upload_resource', methods=['POST'])
-def upload_resource():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file uploaded'}), 400
-    
-    file = request.files['file']
-    mentor_id = request.form.get('mentor_id')
-    
-    if not mentor_id:
-        return jsonify({'error': 'Mentor ID is required'}), 400
-    
-    file_type = file.content_type.split('/')[0]
-    filename = file.filename
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    file.save(file_path)
-    
-    resource = Resource(mentor_id=mentor_id, filename=filename, file_type=file_type, url=file_path)
-    db.session.add(resource)
-    db.session.commit()
-    
-    return jsonify({'message': 'Resource uploaded successfully', 'url': file_path}), 201
 
-@app.route('/delete_resource/<int:resource_id>', methods=['DELETE'])
-def delete_resource(resource_id):
-    resource = Resource.query.get(resource_id)
-    if not resource:
-        return jsonify({'error': 'Resource not found'}), 404
-    
-    db.session.delete(resource)
-    db.session.commit()
-    
-    return jsonify({'message': 'Resource deleted successfully'}), 200
 
-@app.route('/get_resources', methods=['GET'])
-def get_resources():
-    resources = Resource.query.all()
-    resource_list = [{'id': res.id, 'mentor_id': res.mentor_id, 'filename': res.filename, 'file_type': res.file_type, 'url': res.url} for res in resources]
-    return jsonify(resource_list), 200
+
+#Progress checking part
+
+
+
+#new fe...
 
 
 
 if __name__ == '__main__':
-    if not os.path.exists(app.config['UPLOAD_FOLDER']):
-        os.makedirs(app.config['UPLOAD_FOLDER'])
+    #db.init_app(app)
 
     with app.app_context():
         db.create_all()
