@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentor Management</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light background for better contrast */
+            font-family: Arial, sans-serif;
+        }
+        .navbar {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for the navbar */
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem; /* Larger font for the brand name */
+        }
+        .nav-link {
+            font-size: 1rem; /* Slightly larger font for links */
+            font-weight: 500; /* Medium weight for better readability */
+            color: #ffffff !important; /* Ensure links are white */
+            transition: color 0.3s ease; /* Smooth transition for hover effect */
+        }
+        .nav-link:hover {
+            color: #adb5bd !important; /* Light gray on hover */
+        }
+        .container {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: white; /* White background for content */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for better aesthetics */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">Mentor Management</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto d-flex align-items-center">
+                    {% if session['role'] == 'student' %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('apply') }}">Apply</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('my_applications') }}">My Applications</a></li>
+                    {% elif session['role'] == 'admin' %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('all_applications') }}">Manage Applications</a></li>
+                    {% endif %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+<!-- 
+
+@app.route('/send_message', methods=['POST'])
+def send_message():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    sender = session['user']
+    sender_role = session['role']
+    
+    receiver_id = request.form['receiver_id']
+    receiver_role = request.form['receiver_role']
+    content = request.form['content']
+    file = request.files.get('file')
+
+    file_url = None
+    if file:
+        file_path = f'static/uploads/{file.filename}'
+        file.save(file_path)
+        file_url = file_path
+
+    message = Message(
+        sender_id=sender,
+        sender_role=sender_role,
+        receiver_id=receiver_id,
+        receiver_role=receiver_role,
+        content=content,
+        file_url=file_url
+    )
+    db.session.add(message)
+    db.session.commit()
+    
+    return jsonify({"message": "Message sent successfully"}), 200
+
+@app.route('/get_messages/<int:receiver_id>/<string:receiver_role>')
+def get_messages(receiver_id, receiver_role):
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    sender = session['user']
+    sender_role = session['role']
+
+    messages = Message.query.filter(
+        ((Message.sender_id == sender) & (Message.receiver_id == receiver_id) &
+         (Message.sender_role == sender_role) & (Message.receiver_role == receiver_role)) |
+        ((Message.sender_id == receiver_id) & (Message.receiver_id == sender) &
+         (Message.sender_role == receiver_role) & (Message.receiver_role == sender_role))
+    ).order_by(Message.timestamp).all()
+
+    return jsonify([
+        {
+            "sender_id": msg.sender_id,
+            "receiver_id": msg.receiver_id,
+            "content": msg.content,
+            "file_url": msg.file_url,
+            "timestamp": msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        } for msg in messages
+    ])
+
+
+class Message(db.Model):
+    message_id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, nullable=False)  # Can be student_id or mentor_id
+    receiver_id = db.Column(db.Integer, nullable=False)  # Can be student_id or mentor_id
+    sender_role = db.Column(db.String(10), nullable=False)  # 'student' or 'mentor'
+    receiver_role = db.Column(db.String(10), nullable=False)  # 'student' or 'mentor'
+    content = db.Column(db.Text, nullable=False)
+    file_url = db.Column(db.String(255), nullable=True)  # For attachments
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+    app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+
+-->

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Bookings</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            padding-top: 70px; /* Prevent content overlap with the navbar */
+            background-color: #f8f9fa; /* Light background for better contrast */
+        }
+        h2 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #343a40; /* Darker heading color for better visibility */
+        }
+        table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            background-color: white; /* White background for the table */
+            border-radius: 8px; /* Rounded corners for the table */
+            overflow: hidden; /* Prevent content overflow */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for better aesthetics */
+        }
+        th {
+            background-color: #007bff; /* Blue header background */
+            color: white; /* White text for headers */
+            text-align: center;
+        }
+        td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        td a {
+            text-decoration: none;
+            color: #007bff; /* Link color */
+            font-weight: bold; /* Bold links for better visibility */
+        }
+        td a:hover {
+            color: #0056b3; /* Darker blue on hover */
+        }
+        .badge {
+            font-size: 0.9rem; /* Slightly smaller badges */
+            padding: 0.5em 0.75em; /* Adjust padding for better appearance */
+        }
+        .btn {
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sticky Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top custom-navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Admin Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <!-- Dropdown Menu for Management -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Manage
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#manage-mentors">Manage Mentors</a></li>
+                            <li><a class="dropdown-item" href="#manage-students">Manage Students</a></li>
+                            <li><a class="dropdown-item" href="#resources">Manage Resources</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">View</a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="all_applicants.html">Applicants</a></li>
+                            <li><a class="dropdown-item" href="#">Bookings</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Profile</a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#">Settings</a></li>
+                            <li><a class="dropdown-item" href="login.html">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>All Bookings</h2>
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Student</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.student.username }}</td>
+                    <td>{{ booking.date }}</td>
+                    <td>{{ booking.booking_time }}</td>
+                    <td>
+                        <span class="badge {% if booking.status == 'pending' %}bg-warning{% elif booking.status == 'approved' %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ booking.status }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if booking.status == 'pending' %}
+                            <a href="{{ url_for('approve_booking', booking_id=booking.booking_id) }}" class="btn btn-success btn-sm">Approve</a>
+                            <a href="{{ url_for('decline_booking', booking_id=booking.booking_id) }}" class="btn btn-danger btn-sm">Decline</a>
+                        {% else %}
+                            <span class="text-muted">No Actions</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

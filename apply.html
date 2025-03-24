@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply To Be A Mentor</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Full viewport height */
+            margin: 0; /* Remove default margin */
+            background-color: #f8f9fa; /* Light background for better contrast */
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            background-color: white; /* White background for the form */
+            padding: 30px;
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for better aesthetics */
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #343a40; /* Darker heading color */
+        }
+        .form-group textarea {
+            width: 100%;
+            height: 150px;
+            resize: none;
+            border-radius: 5px; /* Rounded corners for the textarea */
+            border: 1px solid #ced4da; /* Subtle border */
+        }
+        .form-group textarea:focus {
+            border-color: #007bff; /* Blue border on focus */
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.25); /* Subtle shadow on focus */
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #007bff; /* Primary button color */
+            border: none;
+            border-radius: 5px; /* Rounded corners */
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        .btn-submit:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+        .btn-back {
+            display: block;
+            margin-top: 15px;
+            text-align: center;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        .btn-back:hover {
+            color: #0056b3; /* Darker blue on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Apply to be a Mentor</h2>
+        <form method="POST">
+            <div class="form-group">
+                <label for="answers">Why should you be a mentor?</label>
+                <textarea name="answers" id="answers" placeholder="Enter your response here..." class="form-control" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-submit">Submit</button>
+        </form>
+        <a href="/dashboard" class="btn-back">Back to Dashboard</a>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

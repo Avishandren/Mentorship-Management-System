@@ -1,0 +1,139 @@
+.welcome-text {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.nav-link:hover, .btn:hover {
+    background-color: #f8f9fa;
+    color: #000;
+}
+
+/* Basic resets */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7fc;
+    color: #333;
+}
+
+.container {
+    width: 80%;
+    margin: 2rem auto;
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+    color: #444;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 0.5rem;
+    margin-top: 2rem;
+}
+
+.detail p, .application-responses li {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+}
+
+.application-responses {
+    list-style: none;
+}
+
+.application-responses li {
+    padding-left: 1rem;
+    position: relative;
+}
+
+.application-responses li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #4CAF50;
+    font-size: 1.5rem;
+}
+
+.buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.approve-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.approve-btn:hover {
+    background-color: #45a049;
+}
+
+.reject-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.reject-btn:hover {
+    background-color: #e53935;
+}
+
+.back-link {
+    font-size: 1rem;
+    color: #007bff;
+    text-decoration: none;
+    padding-top: 1rem;
+    display: inline-block;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        width: 90%;
+        padding: 1rem;
+    }
+
+    h1, h2 {
+        font-size: 1.5rem;
+    }
+
+    .detail p, .application-responses li {
+        font-size: 0.9rem;
+    }
+
+    .buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.container-fluid {
+    margin-top: 20px;
+}
+textarea {
+    resize: none;
+}
