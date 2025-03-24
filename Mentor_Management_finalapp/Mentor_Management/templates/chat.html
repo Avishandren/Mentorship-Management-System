@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #f4f4f4; /* Light background */
+        }
+
+        nav {
+            background-color: #007bff; /* Blue navbar */
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .chat-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .user-select form {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-select label {
+            margin-right: 10px;
+        }
+
+        .user-select select {
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .user-select button {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .message-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-list li {
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            background-color: #e6f7ff;
+            list-style-type: none;
+        }
+
+        .message-list li strong {
+            color: #007bff;
+        }
+
+        .message-list p {
+            text-align: center;
+            color: #888;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/logout">Logout</a>
+    </nav>
+    <div class="chat-container">
+        <h1>Chat</h1>
+        <div class="user-select">
+            <form method="POST">
+                <label for="receiver">Select a user to start a chat:</label>
+                <select name="receiver_id" id="receiver">
+                    {% for user in users %}
+                        <option value="{{ user.student_id }}">{{ user.username }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Start Chat</button>
+            </form>
+        </div>
+
+        <div class="message-list">
+            <ul>
+                {% if messages %}
+                    {% for message in messages %}
+                        <li><strong>{{ message.sender.username }}:</strong> {{ message.content }}</li>
+                    {% endfor %}
+                {% else %}
+                    <p>No messages</p>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
