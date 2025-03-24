@@ -30,6 +30,10 @@ app.config['MAIL_PASSWORD'] = 'rufc leoy ymeb ywhm'
 
 mail = Mail(app)
 
+# Ensure the upload folder exists
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+
 class Student(db.Model):
     student_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -44,7 +48,16 @@ def is_valid_email(email):
     email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
     return re.match(email_regex, email)
 
+class Message(db.Model):
+    message_id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, nullable=False)
+    receiver_id = db.Column(db.Integer, nullable=False)
+    content = db.Column(db.Text, nullable=True)
+    file_url = db.Column(db.String(255), nullable=True)  # Store file URL if a file is uploaded
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+    def __repr__(self):
+        return f'<Message {self.message_id}>'
 
 
 
@@ -497,6 +510,76 @@ def email_students():
 
 
 #Messaging part 
+
+@app.route('/send_message', methods=['POST'])
+def send_message():
+    if 'user' not in session:
+        return jsonify({"error": "Unauthorized"}), 401  # User must be logged in
+
+    # Get data from the form
+    receiver_id = request.form.get('receiver_id')
+    receiver_role = request.form.get('receiver_role')
+    content = request.form.get('content')
+    file = request.files.get('file')
+
+    # Determine sender ID from session based on role
+    if session.get('role') == 'student':
+        sender_id = Student.query.filter_by(username=session['user']).first().student_id
+    elif session.get('role') == 'mentor':
+        sender_id = Mentor.query.filter_by(username=session['user']).first().mentor_id
+    else:
+        return jsonify({"error": "Invalid user role"}), 400
+
+    # If file is uploaded, save it to the file system
+    file_url = None
+    if file:
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        file.save(file_path)
+        file_url = file_path  # Store the file path or URL
+
+    # Create and save the message to the database
+    message = Message(sender_id=sender_id, receiver_id=receiver_id, content=content, file_url=file_url)
+    db.session.add(message)
+    db.session.commit()
+
+    return jsonify({"success": "Message sent successfully!"}), 200
+
+@app.route('/get_messages/<int:receiver_id>/<string:receiver_role>', methods=['GET'])
+def get_messages(receiver_id, receiver_role):
+    if 'user' not in session:
+        return jsonify({"error": "Unauthorized"}), 401  # User must be logged in
+
+    # Determine sender ID from session based on role
+    if session.get('role') == 'student':
+        sender_id = Student.query.filter_by(username=session['user']).first().student_id
+    elif session.get('role') == 'mentor':
+        sender_id = Mentor.query.filter_by(username=session['user']).first().mentor_id
+    else:
+        return jsonify({"error": "Invalid user role"}), 400
+
+    # Query messages where the sender and receiver match
+    messages = Message.query.filter(
+        ((Message.sender_id == sender_id) & (Message.receiver_id == receiver_id)) |
+        ((Message.sender_id == receiver_id) & (Message.receiver_id == sender_id))
+    ).order_by(Message.timestamp.asc()).all()
+
+    # Serialize messages to return as JSON
+    messages_data = [
+        {
+            'content': msg.content,
+            'file_url': msg.file_url,
+            'timestamp': msg.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        } for msg in messages
+    ]
+
+    return jsonify(messages_data)
+
+# Route to render the chat page
+@app.route('/chat/<int:receiver_id>/<string:receiver_role>')
+def chat(receiver_id, receiver_role):
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    return render_template('chat.html', receiver_id=receiver_id, receiver_role=receiver_role)
 
 #Rating and Reviews part
 
