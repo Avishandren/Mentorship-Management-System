@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timedelta
+from datetime import datetime
 from flask_migrate import Migrate
 import json
 from flask import jsonify, request, flash
@@ -27,8 +27,7 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'm48209921@gmail.com'
 app.config['MAIL_PASSWORD'] = 'rufc leoy ymeb ywhm'
-app.config['MAIL_DEFAULT_SENDER'] ='48209921@gmail.com'
-
+app.config['MAIL_DEFAULT_SENDER'] = 'm48209921@gmail.com'
 
 
 mail = Mail(app)
@@ -115,10 +114,7 @@ class Progress(db.Model):
     comments = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def __repr__(self):
-        return f"<Progress for Student {self.student_id} by Mentor {self.mentor_id}>"
-
-
+   
 
 
 
@@ -690,7 +686,6 @@ def email_studentss():
     return render_template('email_students.html', students=students)
 
 
-    
 #Rating and Reviews part
 @app.route('/review', methods=['GET', 'POST'])
 def review():
@@ -890,5 +885,6 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         
+    app.run(debug=True)
     app.run(host='0.0.0.0', port=5000, debug=True)
 
