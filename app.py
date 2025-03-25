@@ -657,7 +657,6 @@ def email_students():
 
     return render_template('email_students.html', students=students)
 
-from flask_mail import Message  # Ensure correct import
 
 @app.route('/email_studentss', methods=['GET', 'POST'])
 def email_studentss():
