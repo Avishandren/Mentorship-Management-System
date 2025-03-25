@@ -881,7 +881,7 @@ def my_progress():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)b.init_app(app)
+    app.run(host='0.0.0.0', debug=True)
 
 
 
