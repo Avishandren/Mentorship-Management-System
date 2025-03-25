@@ -11,7 +11,7 @@ from flask_socketio import SocketIO, emit
 from flask_mail import Mail, Message
 from flask_cors import CORS
 import os
-
+from waitress import serve
 app = Flask(__name__)
 CORS(app) #1
 app.secret_key = 'your_secret_key'
@@ -881,8 +881,10 @@ def my_progress():
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
-    app.run(host='0.0.0.0', debug=True)
+        db.create_all()  # Ensure database tables are created
+    
+    # Run with Waitress (Windows)
+    serve(app, host='0.0.0.0', port=8000)
 
 
 
