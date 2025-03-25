@@ -15,7 +15,7 @@ import os
 app = Flask(__name__)
 CORS(app) #1
 app.secret_key = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///final33.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///final3322.db'
 
 db = SQLAlchemy(app)
 socketio = SocketIO(app)
@@ -876,11 +876,12 @@ def my_progress():
 
 
 #new fe...
-    with app.app_context():
-        db.create_all()
+    
 
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(host='0.0.0.0', debug=True)
 
 
