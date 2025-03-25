@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Progress</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>My Progress</h1>
+        {% if progress_updates %}
+            <ul class="list-group">
+                {% for progress in progress_updates %}
+                    <li class="list-group-item">
+                        <strong>Date:</strong> {{ progress.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}<br>
+                        <strong>Rating:</strong> {{ progress.rating }}<br>
+                        <strong>Comments:</strong><br>
+                        {{ progress.comments }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No progress updates available.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

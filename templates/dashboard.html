@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales-all.min.js"></script>
+    <style>
+        body { padding: 20px; }
+        .container { max-width: 800px; }
+        .card { margin-bottom: 20px; }
+        .nav-link { cursor: pointer; border: 1px solid #ddd; padding: 8px 12px; margin: 2px; border-radius: 4px; }
+        .nav-link:hover { background-color: #f0f0f0; }
+        .nav-link.active { background-color: #007bff; color: white; }
+        .dropdown-menu a { border: none; padding: 8px 12px; }
+        .dropdown-menu a:hover { background-color: #f0f0f0; }
+    </style>
+</head>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <div class="container">
+        <h1 class="mb-4">Dashboard</h1>
+        <h2>Welcome, {{ session['user'] }}</h2>
+
+        <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+            <a class="navbar-brand" href="#">Navigation</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    {% if role == 'admin' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/users" style="background-color: #e6f7ff;">View Users</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/create_user" style="background-color: #e6f9e6;">Create User</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/all_applications" style="background-color: #ffe6e6;">Mentor Applications</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownAnalytics" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: #f0f0f0;">
+                                Analytics
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdownAnalytics">
+                                <a class="dropdown-item" href="{{ url_for('all_reviews') }}" style="background-color: #f9f9f9;">Mentor Analytics</a>
+                                <a class="dropdown-item" href="{{ url_for('analytics') }}" style="background-color: #f9f9f9;">General Analytics</a>
+                            </div>
+                        </li>
+                    {% elif role == 'student' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/book_session" style="background-color: #e6f7ff;">Book a Session</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/join" style="background-color: #e6f7ff;">Join a Video Meeting</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/apply" style="background-color: #fff9e6;">Apply To Be A Mentor</a>
+                        </li>
+                        
+
+                        <li class="nav-item">
+                            <a href="{{ url_for('chat') }}" class="nav-link" style="border: 2px solid #007bff; border-radius: 8px; padding: 10px 15px; background-color: #f8f9fa; color: #007bff; text-align: center;">
+                                Go to Chat
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/my_applications" style="background-color: #f0f0f0;">My Applications</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownReviews" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: #f0f0f0;">
+                                Reviews
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdownReviews">
+                                <a class="dropdown-item" href="{{ url_for('review') }}" style="background-color: #f9f9f9;">Give Review</a>
+                                <a class="dropdown-item" href="{{ url_for('get_reviews') }}" style="background-color: #f9f9f9;">My Reviews</a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/manage_profile" style="background-color: #fff9e6;">Manage Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('my_progress') }}" style="background-color: #e6f7ff;">My Progress</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/my_bookings" style="background-color: #fff9e6;">My Bookings</a>
+                        </li>
+                    {% elif role == 'mentor' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/all_bookings" style="background-color: #e6f7ff;">View All Bookings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/meeting" style="background-color: #fff9e6;">Create A Video Meeting</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('chat') }}">Go to Chat</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/email_students" style="background-color: #fff9e6;">Email students</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/manage_profile" style="background-color: #fff9e6;">Manage Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('all_progress') }}" style="background-color: #e6f7ff;">View/Update Progress</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="/logout" style="background-color: #ffe6e6;">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="card">
+            <div class="card-header">Booking Calendar</div>
+            <div class="card-body"> 
+                <div id="calendar"></div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var calendarEl = document.getElementById('calendar');
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    events: '/get_approved_bookings'
+                });
+                calendar.render();
+            });
+        </script>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
