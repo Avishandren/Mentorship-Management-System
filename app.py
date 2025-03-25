@@ -27,6 +27,8 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'm48209921@gmail.com'
 app.config['MAIL_PASSWORD'] = 'rufc leoy ymeb ywhm'
+app.config['MAIL_DEFAULT_SENDER'] ='48209921@gmail.com'
+
 
 
 mail = Mail(app)
@@ -626,30 +628,35 @@ def join():
 def email_students():
     if 'user' not in session or session['role'] != 'mentor':
         return redirect(url_for('login'))
-    
+
     students = Student.query.all()
-    
+
     if request.method == 'POST':
         subject = request.form['subject']
         message_body = request.form['message']
         selected_students = request.form.getlist('students')
-        
+
         if 'all' in selected_students:
             recipients = [student.username for student in students]
         else:
             recipients = selected_students
-        
+
         # Ensure recipients list is not empty
         if not recipients:
             return "No recipients selected. Please choose at least one student.", 400
-        
-        msg = Message(subject, sender='Bookingupdate@gmail.com', recipients=recipients)
+
+        msg = Message(subject, sender=app.config['MAIL_DEFAULT_SENDER'], recipients=recipients)
         msg.body = message_body
-        mail.send(msg)
-        
+        try:
+            mail.send(msg)
+        except Exception as e:
+            print(f"Error sending email: {e}")  # Log the error for debugging
+            return "Error sending email. Please check the server logs.", 500  # Return an error message to the user
+
         return redirect(url_for('dashboard'))
-    
+
     return render_template('email_students.html', students=students)
+
 
 @app.route('/email_studentss', methods=['GET', 'POST'])
 def email_studentss():
@@ -664,7 +671,7 @@ def email_studentss():
         selected_students = request.form.getlist('students')
         
         if 'all' in selected_students:
-            recipients = [student.username for student in students]
+            recipients = [student.email for student in students]  # Use emails, not usernames
         else:
             recipients = selected_students
         
@@ -672,16 +679,15 @@ def email_studentss():
         if not recipients:
             return "No recipients selected. Please choose at least one student.", 400
         
-        msg = Message(subject, sender='Mentorapplications@gmail.com', recipients=recipients)
+        # Ensure correct Message instantiation
+        msg = Message(subject=subject, sender='Mentorapplications@gmail.com', recipients=recipients)
         msg.body = message_body
         mail.send(msg)
         
         return redirect(url_for('dashboard'))
     
     return render_template('email_students.html', students=students)
-
-
-
+    
 #Rating and Reviews part
 @app.route('/review', methods=['GET', 'POST'])
 def review():
