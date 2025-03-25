@@ -3,7 +3,7 @@ services:
     name: mentorship-management-system
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python app.py
+    startCommand: cd Mentor_Management_finalapp/Mentor_Management && gunicorn app:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.11
